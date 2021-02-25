@@ -81,12 +81,12 @@ Multiple R-squared:  0.7526,	Adjusted R-squared:  0.6937
 F-statistic: 12.78 on 5 and 21 DF,  p-value: 8.814e-06
 
 
-Reactions to Summary of Multi-Variable Model Results:
+# Reactions to Summary of Multi-Variable Model Results:
 
--	Same Multiple R-squared of 0.7526 means new model has same variable explanations as previous model. 
--	Higher T-values of age and sum shows that using ages gives better results
+# -	Same Multiple R-squared of 0.7526 means new model has same variable explanations as previous model. 
+# -	Higher T-values of age and sum shows that using ages gives better results
 
-Update Linear Model to show only sum and age:
+# Update Linear Model to show only sum and age:
 
 WineModel3 = lm(price ~ sum + age, data = df52_80)
 summary(WineModel3)
@@ -107,20 +107,19 @@ Multiple R-squared:  0.4337,	Adjusted R-squared:  0.3865
 F-statistic: 9.191 on 2 and 24 DF,  p-value: 0.001087
 
 
-Reactions to Summary of Multi-Variable Model Results:
+# Reactions to Summary of Multi-Variable Model Results:
 
--	Lower Multiple R-squared of 0.4337 and lower t-values for the variables means new model is inferior to previous model. 
--	After trying a few more different variable combinations with inferior results, it looks like WineModel2 is the best one. 
+# -	Lower Multiple R-squared of 0.4337 and lower t-values for the variables means new model is inferior to previous model. 
+# -	After trying a few more different variable combinations with inferior results, it looks like WineModel2 is the best one. 
 
 
  
-Use predict() function on WineModel2 to predict prices for years 81 - 91
-(after converting text file to CSV):
+# Use predict() function on WineModel2 to predict prices for years 81 - 91
 
 df81_91 = read.csv("bordeauxp81_91.csv") 
 predict(WineModel2, newdata = df81_91)
 
-Result: Model-derived estimated prices by year from 1981 - 1991:
+# Result: Model-derived estimated prices by year from 1981 - 1991:
 
        1 (1981)         2          3(1983)            4         	5         	 6 (1986)        	7 
 26.260262  38.291343  46.180781  12.535262  38.457597   5.786086  18.661583 
@@ -128,27 +127,27 @@ Result: Model-derived estimated prices by year from 1981 - 1991:
 36.891315  43.849990  48.383075  31.103736
 
 
-SPECIFIC QUESTIONS IN PROJECT ASSIGNMENT:
+#SPECIFIC QUESTIONS IN PROJECT ASSIGNMENT:
 
-4. Is 1986 a superior vintage as the experts seemed to think?
-No, 1986 is estimated at the lowest price in the WineModel2 at $5.79, and this is driven by having the lowest summer temperature of any year from 1981 – 1991.  
+# 4. Is 1986 a superior vintage as the experts seemed to think?
+# No, 1986 is estimated at the lowest price in the WineModel2 at $5.79, and this is driven by having the lowest summer temperature of any year from 1981 – 1991.  
 
-5. Is September temperature statistically more relevant than summer temperature?
-No, summer temperature has the highest t-value in my models, being at 3.5 in WineModel2, versus a t-value of 1.2 for September temperature (one of the least relevant variables).  
+# 5. Is September temperature statistically more relevant than summer temperature?
+# No, summer temperature has the highest t-value in my models, being at 3.5 in WineModel2, versus a t-value of 1.2 for September temperature (one of the least relevant variables).  
 
-6. 1983, 1989, and 1990 are known to be great vintages in hindsight. Does your model agree with this statement and how do they compare to 1961?
+# 6. 1983, 1989, and 1990 are known to be great vintages in hindsight. Does your model agree with this statement and how do they compare to 1961?
 
-Yes, those listed years had the highest 3 prices of any years from 1981 – 1991.  They all had prices of over $43, where the highest price in any other year besides these there was less than $39.  They do not compare, however, with the 1961 vintage with a price index value of $100.  This is significantly explained by age.  To test this, a model retest was performed on the 81-91 dataset with an update to one value in 1990, which was the highest year price during that time period:  age was updated from “2” to “31” (base year of age is 1992) which would be the age of a 1961 vintage, keeping all other variables from the 1990 vintage the same.  The result is as follows:
+# Yes, those listed years had the highest 3 prices of any years from 1981 – 1991.  They all had prices of over $43, where the highest price in any other year besides these there was less than $39.  They do not compare, however, with the 1961 vintage with a price index value of $100.  This is significantly explained by age.  To test this, a model retest was performed on the 81-91 dataset with an update to one value in 1990, which was the highest year price during that time period:  age was updated from “2” to “31” (base year of age is 1992) which would be the age of a 1961 vintage, keeping all other variables from the 1990 vintage the same.  The result is as follows:
 
-10 (1990 with age of “31” to simulate 1961):       
+#10 (1990 with age of “31” to simulate 1961):       
 Price Index: 74.044546 
 
-So the age of the wine in the 1961 vintage drives about half of the difference between 1990 price index of 48.4 and the 1961 price index of 100.  Once might assume that other 1961 variables, such as the temperatures, were also positive compared to the 1981 – 1991 range.
+# So the age of the wine in the 1961 vintage drives about half of the difference between 1990 price index of 48.4 and the 1961 price index of 100.  Once might assume that other 1961 variables, such as the temperatures, were also positive compared to the 1981 – 1991 range.
 
  
-Predict prices for 2017 and 2018:
+# Predict prices for 2017 and 2018:
 
-Created new CSV file with values for 2017 and 2018.  Note that since 1991 had an age of “1” in the previous dataset and previous years before 1991 had higher age values, I concluded the age variable has a “base” or zero value of year 1992.  I therefore gave 2017 an age value of -15, and  2018 an age value of -16.   With that CSV file ran the following R commands:
+# Created new CSV file with values for 2017 and 2018.  Note that since 1991 had an age of “1” in the previous dataset and previous years before 1991 had higher age values, I concluded the age variable has a “base” or zero value of year 1992.  I therefore gave 2017 an age value of -15, and  2018 an age value of -16.   With that CSV file ran the following R commands:
 
 df17_18 = read.csv("bordeauxp17_18.csv")
 predict(WineModel2, newdata = df17_18)
@@ -157,7 +156,7 @@ Results:
        1                2 
 39.70514   66.73216
 
-Reactions Wine Model Results for 2017 and 2018:
+# Reactions Wine Model Results for 2017 and 2018:
 
--	The higher prices make sense in these results given the high summer temperatures in those years.  Also, 2018 has a high September temperature and a lower harvest rain value, which is a negatively correlated value.  
+# -	The higher prices make sense in these results given the high summer temperatures in those years.  Also, 2018 has a high September temperature and a lower harvest rain value, which is a negatively correlated value.  
 
