@@ -1,0 +1,163 @@
+
+# Create dataset variable from input text file
+# Code to create dataset from (original text file converted to CSV via Excel – was having problems in R Studio reading the text file):
+
+setwd("/Users/bjsmacbookpromainacct/RRR_Data_Science")
+df52_80 = read.csv("bordeaux52_80.csv")
+
+# Bar Plot to see price over time and visualize range of price values:
+barplot(df52_80$price, names.arg = df52_80$year)
+ 
+# Scatter Plot all individual variables to visually see their relationship to price:
+
+plot(df52_80$sum, df52_80$price)
+ 
+plot(df52_80$har, df52_80$price)
+ 
+plot(df52_80$sep, df52_80$price) 
+ 
+plot(df52_80$win, df52_80$price)
+
+# Conclusions from initial plots:
+# -	No individual variable appears to have a strong, linear correlation to price. 
+# -	Of the individual variables, September Temperature and Summer Temperature appear somewhat correlated to price, with remainders/variance/errors from the fitted line increasing at higher temperatures.  Also, the date/age variables appear to show a correlation with price, with price decreasing over time as the age value gets lower when closer to today’s date. 
+
+# Build a Linear Model with all Variables:
+
+WineModel = lm(price ~ ., data = df52_80)
+Summary(WineModel)
+
+Residuals:
+     Min       1Q   	Median       	3Q      		Max 
+-18.0454  -7.9644  	-0.7287   	3.8198  	23.8098 
+
+Coefficients: (1 not defined because of singularities)
+
+              Estimate Std. 		Error 		t value 		Pr(>|t|)   
+(Intercept) 1436.56043  	603.62654   	2.380  		0.02687 * 
+year          -0.88488    		0.29455  	-3.004  	0.00676 **
+sum           16.30232    		4.66355   	3.496  		0.00215 **
+har           -0.07990    		0.03758  	-2.126  	0.04551 * 
+sep            2.59129    		2.24518   	1.154  		0.26140   
+win            0.05183    		0.02011  	 2.577  		0.01757 * 
+age                 NA         		NA      		NA       		NA   
+
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 11.6 on 21 degrees of freedom
+Multiple R-squared:  0.7526,	Adjusted R-squared:  0.6937 
+F-statistic: 12.78 on 5 and 21 DF,  p-value: 8.814e-06
+
+# Reactions to Summary of Multi-Variable Model Results:
+
+# -	Multiple R-squared:  0.7526 means 75% of price variability can be explained by variables in our model. 
+# -	Intercept of 1,436:  Says that the estimated price for a bottle of wine would be this amount if all x values (variables) were value zero.  Since this value is higher than a multiple value of even the highest price in the model, and would need to assume that the year variable was zero (among other things), this Intercept value is not very use full in our model that has all variables.  
+# -	Age variable “singularaties” – On-line description: “one of the covariates you're using in the model is predicted perfectly by another one” --  Assuming this would be year here.  Remove “year” since Age has a better proportional response to itself.
+# -	Summer Temperature Variable (sum) appears to have the strongest correlation to price, followed closely by Year, which might be better described as Age
+
+# Update Linear Model to replace year with age:
+
+WineModel2 = lm(price ~ .-year, data = df52_80)
+Summary(WineModel2)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-18.0454  -7.9644  -0.7287   3.8198  23.8098 
+
+Coefficients:
+              		Estimate Std. Error 		t value    Pr(>|t|)    
+(Intercept)          -326.11712   	68.80879  	-4.739 	0.000111 ***
+sum           		16.30232    	4.66355   	3.496 	0.002154 ** 
+har           		-0.07990    	0.03758  	-2.126 	0.045513 *  
+sep            		2.59129    	2.24518   	1.154 	0.261403    
+win            		0.05183    	0.02011   	2.577 	0.017568 *  
+age            		0.88488    	0.29455   	3.004 	0.006757 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 11.6 on 21 degrees of freedom
+Multiple R-squared:  0.7526,	Adjusted R-squared:  0.6937 
+F-statistic: 12.78 on 5 and 21 DF,  p-value: 8.814e-06
+
+
+Reactions to Summary of Multi-Variable Model Results:
+
+-	Same Multiple R-squared of 0.7526 means new model has same variable explanations as previous model. 
+-	Higher T-values of age and sum shows that using ages gives better results
+
+Update Linear Model to show only sum and age:
+
+WineModel3 = lm(price ~ sum + age, data = df52_80)
+summary(WineModel3)
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-19.117 -12.928  -2.552   7.497  53.310 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)   
+(Intercept) -254.2041    82.5455  -3.080  0.00513 **
+sum           15.9661     5.1499   3.100  0.00488 **
+age            0.7962     0.4072   1.955  0.06232 . 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 16.41 on 24 degrees of freedom
+Multiple R-squared:  0.4337,	Adjusted R-squared:  0.3865 
+F-statistic: 9.191 on 2 and 24 DF,  p-value: 0.001087
+
+
+Reactions to Summary of Multi-Variable Model Results:
+
+-	Lower Multiple R-squared of 0.4337 and lower t-values for the variables means new model is inferior to previous model. 
+-	After trying a few more different variable combinations with inferior results, it looks like WineModel2 is the best one. 
+
+
+ 
+Use predict() function on WineModel2 to predict prices for years 81 - 91
+(after converting text file to CSV):
+
+df81_91 = read.csv("bordeauxp81_91.csv") 
+predict(WineModel2, newdata = df81_91)
+
+Result: Model-derived estimated prices by year from 1981 - 1991:
+
+       1 (1981)         2          3(1983)            4         	5         	 6 (1986)        	7 
+26.260262  38.291343  46.180781  12.535262  38.457597   5.786086  18.661583 
+        8             9 (1989)     10 (1990)     11 (1991)
+36.891315  43.849990  48.383075  31.103736
+
+
+SPECIFIC QUESTIONS IN PROJECT ASSIGNMENT:
+
+4. Is 1986 a superior vintage as the experts seemed to think?
+No, 1986 is estimated at the lowest price in the WineModel2 at $5.79, and this is driven by having the lowest summer temperature of any year from 1981 – 1991.  
+
+5. Is September temperature statistically more relevant than summer temperature?
+No, summer temperature has the highest t-value in my models, being at 3.5 in WineModel2, versus a t-value of 1.2 for September temperature (one of the least relevant variables).  
+
+6. 1983, 1989, and 1990 are known to be great vintages in hindsight. Does your model agree with this statement and how do they compare to 1961?
+
+Yes, those listed years had the highest 3 prices of any years from 1981 – 1991.  They all had prices of over $43, where the highest price in any other year besides these there was less than $39.  They do not compare, however, with the 1961 vintage with a price index value of $100.  This is significantly explained by age.  To test this, a model retest was performed on the 81-91 dataset with an update to one value in 1990, which was the highest year price during that time period:  age was updated from “2” to “31” (base year of age is 1992) which would be the age of a 1961 vintage, keeping all other variables from the 1990 vintage the same.  The result is as follows:
+
+10 (1990 with age of “31” to simulate 1961):       
+Price Index: 74.044546 
+
+So the age of the wine in the 1961 vintage drives about half of the difference between 1990 price index of 48.4 and the 1961 price index of 100.  Once might assume that other 1961 variables, such as the temperatures, were also positive compared to the 1981 – 1991 range.
+
+ 
+Predict prices for 2017 and 2018:
+
+Created new CSV file with values for 2017 and 2018.  Note that since 1991 had an age of “1” in the previous dataset and previous years before 1991 had higher age values, I concluded the age variable has a “base” or zero value of year 1992.  I therefore gave 2017 an age value of -15, and  2018 an age value of -16.   With that CSV file ran the following R commands:
+
+df17_18 = read.csv("bordeauxp17_18.csv")
+predict(WineModel2, newdata = df17_18)
+
+Results:
+       1                2 
+39.70514   66.73216
+
+Reactions Wine Model Results for 2017 and 2018:
+
+-	The higher prices make sense in these results given the high summer temperatures in those years.  Also, 2018 has a high September temperature and a lower harvest rain value, which is a negatively correlated value.  
+
